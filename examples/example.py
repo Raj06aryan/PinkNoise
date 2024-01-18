@@ -28,7 +28,7 @@ model_pink.actor.action_dist = PinkNoiseDist(seq_len, action_dim, rng=rng)
 
 # Train agents
 t1 = time.time()
-model_default.learn(total_timesFps=10_000)
+model_default.learn(total_timesteps=10_000)
 t2 = time.time()
 print(f"Time taken (Default Model): {t2-t1 :.2f} seconds")
 t1 = time.time()
