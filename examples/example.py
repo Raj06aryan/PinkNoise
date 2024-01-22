@@ -5,6 +5,7 @@ import gymnasium as gym
 import numpy as np
 import torch
 from pink import PinkNoiseDist
+from pink import ColoredNoiseDist
 from stable_baselines3 import SAC
 import time
 # Reproducibility
@@ -22,9 +23,11 @@ rng = np.random.default_rng(0)
 # Initialize agents
 model_default = SAC("MlpPolicy", env, seed=seed)
 model_pink = SAC("MlpPolicy", env, seed=seed)
+model_colored = SAC("MlpPolicy", env, seed=seed)
 
 # Set action noise
 model_pink.actor.action_dist = PinkNoiseDist(seq_len, action_dim, rng=rng)
+model_colored.actor.action_dist = ColoredNoiseDist(1.75, seq_len, action_dim, rng=rng)
 
 # Train agents
 t1 = time.time()
@@ -35,11 +38,15 @@ t1 = time.time()
 model_pink.learn(total_timesteps=10_000)
 t2 = time.time()
 print(f"Time taken (Pink Noise Model): {t2-t1 :.2f} seconds")
+t1 = time.time()
+model_colored.learn(total_timesteps=10_000)
+t2 = time.time()
+print(f"Time taken (Colored Noise Model): {t2-t1 :.2f} seconds")
 # Evaluate learned policies
 N = 100
-for name, model in zip(["Default noise\n-------------", "Pink noise\n----------"], [
+for name, model in zip(["Default noise\n-------------", "Pink noise\n----------", "Colored noise\n--------------"], [
         model_default, 
-                                                                        model_pink]):
+                                                                        model_pink, model_colored]):
     solved = 0
     for i in range(N):
         obs, _ = env.reset()
